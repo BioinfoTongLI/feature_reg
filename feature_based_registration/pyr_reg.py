@@ -5,8 +5,11 @@ import cv2 as cv
 import numpy as np
 from sklearn.metrics import normalized_mutual_info_score
 
-from feature_detection import Features
-from tile_registration import find_features, register_img_pair
+from feature_based_registration.feature_detection import Features
+from feature_based_registration.tile_registration import find_features, register_img_pair
+# from feature_detection import Features
+# from tile_registration import find_features, register_img_pair
+
 
 Image = np.ndarray
 

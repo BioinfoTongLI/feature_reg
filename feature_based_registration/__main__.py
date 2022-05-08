@@ -13,8 +13,10 @@ import pandas as pd
 import tifffile as tif
 from skimage.transform import AffineTransform, warp
 
-from metadata_handling import generate_new_metadata, get_dataset_structure
-from pyr_reg import PyrReg
+from feature_based_registration.metadata_handling import generate_new_metadata, get_dataset_structure
+from feature_based_registration.pyr_reg import PyrReg
+# from metadata_handling import generate_new_metadata, get_dataset_structure
+# from pyr_reg import PyrReg
 
 Image = np.ndarray
 
