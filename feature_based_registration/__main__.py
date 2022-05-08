@@ -259,75 +259,7 @@ def check_input_size(img_paths: List[str], is_stack: bool):
         )
 
 
-def main(
-    img_paths: list,
-    ref_img_id: int,
-    ref_channel: str,
-    out_dir: str,
-    n_workers: int,
-    tile_size: int,
-    num_pyr_lvl: int,
-    num_iter: int,
-    stack: bool,
-    estimate_only: bool,
-    load_param: str,
-):
-
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
-    if not out_dir.endswith("/"):
-        out_dir = out_dir + "/"
-
-    st = datetime.now()
-    print("\nstarted", st)
-
-    if n_workers == 1:
-        dask.config.set({"scheduler": "synchronous"})
-    else:
-        dask.config.set({"num_workers": n_workers, "scheduler": "processes"})
-
-    is_stack = stack
-    ref_channel = ref_channel.lower()
-    check_input_size(img_paths, is_stack)
-
-    dataset_structure = get_dataset_structure(img_paths, ref_channel, is_stack)
-
-    if load_param == "none":
-        transform_matrices, target_shape, padding = estimate_registration_parameters(
-            dataset_structure, ref_img_id, tile_size, num_pyr_lvl, num_iter
-        )
-
-    else:
-        reg_param = pd.read_csv(load_param)
-        target_shape = (reg_param.loc[0, "height"], reg_param.loc[0, "width"])
-
-        transform_matrices = []
-        padding = []
-        for i in reg_param.index:
-            matrix = (
-                reg_param.loc[i, ["0", "1", "2", "3", "4", "5"]]
-                .to_numpy()
-                .reshape(2, 3)
-                .astype(np.float32)
-            )
-            pad = reg_param.loc[i, ["left", "right", "top", "bottom"]].to_list()
-            transform_matrices.append(matrix)
-            padding.append(pad)
-
-    if not estimate_only:
-        transform_imgs(
-            dataset_structure, out_dir, target_shape, transform_matrices, is_stack
-        )
-
-    transform_matrices_flat = [M.flatten() for M in transform_matrices]
-    img_paths2 = [dataset_structure[cyc]["img_path"] for cyc in dataset_structure]
-    save_param(img_paths2, out_dir, transform_matrices_flat, padding, target_shape)
-
-    fin = datetime.now()
-    print("\nelapsed time", fin - st)
-
-
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Image registration")
 
     parser.add_argument(
@@ -395,16 +327,72 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    main(
-        args.i,
-        args.r,
-        args.c,
-        args.o,
-        args.n,
-        args.tile_size,
-        args.num_pyr_lvl,
-        args.num_iter,
-        args.stack,
-        args.estimate_only,
-        args.load_param,
-    )
+
+    img_paths = args.i
+    ref_img_id = args.r
+    ref_channel = args.c
+    out_dir = args.o
+    n_workers = args.n
+    tile_size = args.tile_size
+    num_pyr_lvl = args.num_pyr_lvl
+    num_iter = args.num_iter
+    stack = args.stack
+    estimate_only = args.estimate_only
+    load_param = args.load_param
+
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+    if not out_dir.endswith("/"):
+        out_dir = out_dir + "/"
+
+    st = datetime.now()
+    print("\nstarted", st)
+
+    if n_workers == 1:
+        dask.config.set({"scheduler": "synchronous"})
+    else:
+        dask.config.set({"num_workers": n_workers, "scheduler": "processes"})
+
+    is_stack = stack
+    ref_channel = ref_channel.lower()
+    check_input_size(img_paths, is_stack)
+
+    dataset_structure = get_dataset_structure(img_paths, ref_channel, is_stack)
+
+    if load_param == "none":
+        transform_matrices, target_shape, padding = estimate_registration_parameters(
+            dataset_structure, ref_img_id, tile_size, num_pyr_lvl, num_iter
+        )
+
+    else:
+        reg_param = pd.read_csv(load_param)
+        target_shape = (reg_param.loc[0, "height"], reg_param.loc[0, "width"])
+
+        transform_matrices = []
+        padding = []
+        for i in reg_param.index:
+            matrix = (
+                reg_param.loc[i, ["0", "1", "2", "3", "4", "5"]]
+                .to_numpy()
+                .reshape(2, 3)
+                .astype(np.float32)
+            )
+            pad = reg_param.loc[i, ["left", "right", "top", "bottom"]].to_list()
+            transform_matrices.append(matrix)
+            padding.append(pad)
+
+    if not estimate_only:
+        transform_imgs(
+            dataset_structure, out_dir, target_shape, transform_matrices, is_stack
+        )
+
+    transform_matrices_flat = [M.flatten() for M in transform_matrices]
+    img_paths2 = [dataset_structure[cyc]["img_path"] for cyc in dataset_structure]
+    save_param(img_paths2, out_dir, transform_matrices_flat, padding, target_shape)
+
+    fin = datetime.now()
+    print("\nelapsed time", fin - st)
+
+
+if __name__ == "__main__":
+    main()
