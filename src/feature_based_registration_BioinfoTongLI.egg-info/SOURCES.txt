@@ -1,0 +1,15 @@
+LICENSE
+README.md
+pyproject.toml
+setup.cfg
+src/feature-based-registration/__init__.py
+src/feature-based-registration/feature_detection.py
+src/feature-based-registration/metadata_handling.py
+src/feature-based-registration/pyr_reg.py
+src/feature-based-registration/reg.py
+src/feature-based-registration/slicer.py
+src/feature-based-registration/tile_registration.py
+src/feature_based_registration_BioinfoTongLI.egg-info/PKG-INFO
+src/feature_based_registration_BioinfoTongLI.egg-info/SOURCES.txt
+src/feature_based_registration_BioinfoTongLI.egg-info/dependency_links.txt
+src/feature_based_registration_BioinfoTongLI.egg-info/top_level.txt
